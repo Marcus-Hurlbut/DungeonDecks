@@ -41,7 +41,7 @@ export default {
     left: 0;
     margin: 0;
     padding: 0;
-    background: linear-gradient(180deg, rgb(0, 0, 0), #272527, rgb(0, 0, 0));
+    background: linear-gradient(180deg, rgb(0, 0, 0), #181718, rgb(0, 0, 0));
     overflow: hidden;
     z-index: -1;
 }
