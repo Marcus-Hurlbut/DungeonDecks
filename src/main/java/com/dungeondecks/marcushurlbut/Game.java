@@ -1,21 +1,24 @@
 package com.dungeondecks.marcushurlbut;
 
-import com.dungeondecks.marcushurlbut.card.Name;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
-public class Card {
-    public Suit suit;
-    public Name name;
-    public int value;
-    public String imgPath;
+public class Game {
+    public Player[] players = new Player[4];
+    public HashMap<UUID, Integer> playerIDtoInt = new HashMap<UUID, Integer>();
+    
+    public UUID gameID;
+    public boolean active = false;
 
-    public Card() {}
+    public boolean gameEnded = false;
+    public Player gameWinner = null;
+    public boolean endOfRound = true;
+    int roundNumber = 0;
 
-    public Card(Suit suit, Name name, int value, String imgPath) {
-        this.suit = suit;
-        this.name = name;
-        this.value = value;
-        this.imgPath = imgPath;
-    }
+    public int playerInTurn = -1;
+
+    public void initialize(Player[] players) {}
 
     public int getCardID(Card card) {
         int offset = 0;
@@ -27,7 +30,7 @@ public class Card {
             case DIAMOND:
                 offset = 13;
                 break;
-            
+
             case SPADE:
                 offset = 26;
                 break;
@@ -35,7 +38,7 @@ public class Card {
             case CLUB:
                 offset = 39;
                 break;
-        
+
             default:
                 break;
         }
@@ -45,4 +48,5 @@ public class Card {
         }
         return (card.name.ordinal() + offset);
     }
+    
 }

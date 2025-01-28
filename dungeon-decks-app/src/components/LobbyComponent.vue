@@ -95,17 +95,30 @@ export default {
       this.storeStompClient(this.stompClient);
     },
     subscribeNotifyGameStart() {
-      this.stompClient.subscribe('/topic/notifyGameStart/' + this.lobbyID.toString(), message => {
+      let subscription = '/topic/' + this.$route.query.game + '/notifyGameStart/'+ this.lobbyID.toString();
+      this.stompClient.subscribe(subscription, message => {
         console.log('Game Started');
         let body = message.body
         let gameID = JSON.parse(body)
 
         this.storeGameID(gameID)
-        this.$router.push('/heartsGame');
+        this.startGame(this.$route.query.game);
+
+        // this.$router.push('/hearts');
       })
     },
+    startGame(gameName) {
+      console.log('Game name', gameName);
+      if (gameName == 'hearts') {
+        this.$router.push('/hearts');
+      } 
+      else if (gameName == 'spades') {
+        this.$router.push('/spades');
+      }
+    },
     subscribeNotifyPlayerJoined() {
-      this.stompClient.subscribe('/topic/notifyPlayerJoined/' + this.lobbyID.toString() , message => {
+      let subscription = '/topic/' + this.$route.query.game + '/notifyPlayerJoined/'+ this.lobbyID.toString();
+      this.stompClient.subscribe(subscription, message => {
         let body = message.body
         let player = JSON.parse(body);
 
@@ -117,7 +130,7 @@ export default {
       })
     },
     subscribeNewLobby(playerID) {
-      let subscription = '/topic/newLobby/' + playerID.toString();
+      let subscription = '/topic/' + this.$route.query.game  + '/newLobby/' + playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let lobbyID = JSON.parse(message.body);
         console.log('Lobby started: ', lobbyID);
@@ -130,9 +143,9 @@ export default {
     publishNewLobby(playerID) {
       if (this.connected) {
         console.log('Creating Lobby with playerID: ', playerID);
-
+        let dest = "/app/" + this.$route.query.game + "/newLobby";
         this.stompClient.publish({
-          destination: "/app/newLobby",
+          destination: dest,
           body: JSON.stringify({'ID': this.$store.getters.playerID, 'username': this.displayName})
         })
       }

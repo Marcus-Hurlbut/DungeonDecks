@@ -198,7 +198,7 @@ export default {
       };
     },
     subscribeGetHand() {
-      let subscription = '/topic/getHand/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/getHand/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let hand = JSON.parse(message.body);
         this.playerCards = {}
@@ -221,7 +221,7 @@ export default {
       });
     },
     subscribePassCards() {
-      let subscription = '/topic/passCards/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/passCards/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
 
@@ -243,7 +243,7 @@ export default {
       });
     },
     subscribeNotifyPlayersTurn() {
-      let subscription = '/topic/notifyPlayersTurn/' + this.gameID.toString() + '/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/notifyPlayersTurn/' + this.gameID.toString() + '/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let isPlayersTurn = JSON.parse(message.body);
         console.log("isPlayersTurn: ", isPlayersTurn);
@@ -251,7 +251,7 @@ export default {
       });
     },
     subscribePlayTurn() {
-      let subscription = '/topic/playTurn/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/playTurn/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         this.validTurn = JSON.parse(message.body);
         console.log('Card placed was valid: ', this.validTurn);
@@ -270,7 +270,7 @@ export default {
       });
     },
     subscribeNotifyVoidCards() {
-      let subscription = '/topic/notifyVoidCards/' + this.gameID.toString();
+      let subscription = '/topic/hearts/notifyVoidCards/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let usernameToVoidCards = JSON.parse(message.body);
         console.log("Void cards in play updated: ", usernameToVoidCards);
@@ -292,7 +292,7 @@ export default {
       });
     },
     subscribeNotifyPassingPhase() {
-      let subscription = '/topic/notifyPassingPhase/' + this.gameID.toString();
+      let subscription = '/topic/hearts/notifyPassingPhase/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let inPassPhase = JSON.parse(message.body);
         console.log('Notified of passing phase - In pass phase: ', inPassPhase);
@@ -304,7 +304,7 @@ export default {
       });
     },
     subscribeNotifyPassCardsReceived() {
-      let subscription = '/topic/notifyPassCardsReceived/' + this.$store.getters.playerID.toString();
+      let subscription = '/topic/hearts/notifyPassCardsReceived/' + this.$store.getters.playerID.toString();
       this.stompClient.subscribe(subscription, message => {
         let passedCards = JSON.parse(message.body);
 
@@ -324,37 +324,37 @@ export default {
       });
     },
     subscribeNotifyEndOfTrick() {
-      let subscription = '/topic/notifyEndOfTrick/' + this.gameID.toString();
+      let subscription = '/topic/hearts/notifyEndOfTrick/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let name = JSON.parse(message.body);
-        console.log(`[topic/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
+        console.log(`[topic/hearts/notifyEndOfTrick/${this.gameID.toString()}] - trick winner name received: `, name);
         
         // this.voidCardsInPlay = {}
         this.announceTrickWinner(name)
       })
     },
     subscribeNotifyEndOfRound() {
-      let subscription = '/topic/notifyEndOfRound/' + this.gameID.toString();
+      let subscription = '/topic/hearts/notifyEndOfRound/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let isEndOfRound = JSON.parse(message.body);
-        console.log(`[topic/notifyEndOfRound/${this.gameID.toString()}] - message received: `, isEndOfRound)
+        console.log(`[topic/hearts/notifyEndOfRound/${this.gameID.toString()}] - message received: `, isEndOfRound)
         
         this.publishGetHand();
       })
     },
     subscribeUpdateScoreboard() {
-      let subscription = '/topic/updateScoreboard/' + this.gameID.toString();
+      let subscription = '/topic/hearts/updateScoreboard/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         let scoreboardMap = JSON.parse(message.body);
-        console.log(`[topic/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
+        console.log(`[topic/hearts/updateScoreboard/${this.gameID.toString()}] - message received: `, scoreboardMap)
         this.usernameToScore = scoreboardMap;
       })
     },
     subscribeNotifyEndOfGame() {
-      let subscription = '/topic/subscribeNotifyEndOfGame/' + this.gameID.toString();
+      let subscription = '/topic/hearts/subscribeNotifyEndOfGame/' + this.gameID.toString();
       this.stompClient.subscribe(subscription, message => {
         this.winnerName = JSON.parse(message.body);
-        console.log(`[topic/subscribeNotifyEndOfGame/${this.gameID.toString()}] - winner name: `, this.winnerName)
+        console.log(`[topic/hearts/subscribeNotifyEndOfGame/${this.gameID.toString()}] - winner name: `, this.winnerName)
       })
 
     },
@@ -387,7 +387,7 @@ export default {
         this.storeHand(this.playerCards);
 
         this.stompClient.publish({
-          destination: "/app/passCards",
+          destination: "/app/hearts/passCards",
           body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card1, card2, card3])})
         });
 
@@ -398,7 +398,7 @@ export default {
     },
     publishGetHand() {
       this.stompClient.publish({
-        destination: "/app/getHand",
+        destination: "/app/hearts/getHand",
         body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID': this.gameID})
       })
     },
@@ -411,7 +411,7 @@ export default {
         // Dont allow user to start round until after announcment
         if (this.trickWinnerName == null) {
           this.stompClient.publish({
-            destination: "/app/playTurn",
+            destination: "/app/hearts/playTurn",
             body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID':this.gameID, 'cardIDs': JSON.stringify([card])})
           });
         }

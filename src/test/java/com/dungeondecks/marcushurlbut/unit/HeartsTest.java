@@ -11,9 +11,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import com.dungeondecks.marcushurlbut.Card;
-import com.dungeondecks.marcushurlbut.Hearts;
 import com.dungeondecks.marcushurlbut.PassingPhase;
 import com.dungeondecks.marcushurlbut.Player;
+import com.dungeondecks.marcushurlbut.games.Hearts;
 import com.dungeondecks.marcushurlbut.util.TestUtils;
 import com.dungeondecks.marcushurlbut.utils.CardID;
 
@@ -22,7 +22,6 @@ public class HeartsTest {
     private static Hearts hearts;
     private static TestUtils testUtils;
 
-
     private static void setup() {
         gameID = UUID.randomUUID();
         hearts = new Hearts(gameID);
@@ -30,7 +29,7 @@ public class HeartsTest {
     }
 
     private void startGame(Hearts heart, boolean skipPassingPhase, boolean useFakeDeck) {
-        heart.initializePlayers(testUtils.getPlayerList());
+        heart.initializePlayers(testUtils.getPlayerArray());
         if (!useFakeDeck) {
             heart.shuffleAndDeal();
             heart.active = true;
@@ -69,7 +68,7 @@ public class HeartsTest {
     public void initializePlayersTest() {
         setup();
 
-        ArrayList<Player> players = testUtils.getPlayerList();
+        Player[] players = testUtils.getPlayerArray();
         hearts.initializePlayers(players);
         
         assertEquals(hearts.players[0].getPlayerID(), testUtils.player_1_id);
@@ -278,6 +277,39 @@ public class HeartsTest {
         assertTrue(player_4_passCards.equals(player_2_receivedCards));
     }
 
+    // TODO
+    @Test 
+    public void playerPassesOutOfPhase() {
+        setup();
+        startGame(hearts, false, true);
+
+        List<Integer> player_1_passCards = new ArrayList<>(hearts.players[0].getHand().keySet()).subList(0, 3);
+        List<Integer> player_2_passCards = new ArrayList<>(hearts.players[1].getHand().keySet()).subList(0, 3);
+        List<Integer> player_3_passCards = new ArrayList<>(hearts.players[2].getHand().keySet()).subList(0, 3);
+        List<Integer> player_4_passCards = new ArrayList<>(hearts.players[3].getHand().keySet()).subList(0, 3);
+
+        Collections.sort(player_1_passCards);
+        Collections.sort(player_2_passCards);
+        Collections.sort(player_3_passCards);
+        Collections.sort(player_4_passCards);
+    
+        simulatePassPhase(hearts.players, player_1_passCards, player_2_passCards, player_3_passCards, player_4_passCards);
+
+        List<Integer> fakePassCards = new ArrayList<>(hearts.players[0].getHand().keySet()).subList(0, 3);
+        hearts.passCards(hearts.players[0].getPlayerID(), fakePassCards);
+
+        assertTrue(hearts.players[0].getHand().keySet().contains(fakePassCards.get(0)));
+    }
+
+    @Test 
+    public void playerPlaysTurnOutOfPhase() {
+        setup();
+        startGame(hearts, false, true);
+
+        boolean TurnDuringPassPhase = hearts.playTurn(hearts.players[0].getPlayerID(), CardID.CLUB_TWO.getOrdinal());
+        assertFalse(TurnDuringPassPhase);
+    }
+
     @Test
     public void isEndOfTrickTest() {
         setup();
@@ -300,7 +332,7 @@ public class HeartsTest {
     }
 
     @Test
-    public void trickAddedToWinnerTest() {     
+    public void trickAddedToWinnerTest() {
         setup();
         startGame(hearts, true, true);
 
@@ -312,7 +344,7 @@ public class HeartsTest {
     }
 
     @Test
-    public void calculateScoreTest() {
+    public void calculateRoundScoreTest() {
         setup();
         startGame(hearts, true, true);
 
@@ -338,7 +370,6 @@ public class HeartsTest {
 
         hearts.calculateScore();
         assertTrue(hearts.players[2].getScore() == -26);
-
     }
     
     @Test
@@ -363,8 +394,41 @@ public class HeartsTest {
         assertFalse(validTurn);
     }
 
-    // TODO: convert this and other trick tests to integration tests using web sockets
-    // as it aligns better to the test & tests more thoroughly 
+    @Test
+    public void detectEndOfGameTest() {
+        setup();
+        startGame(hearts, true, true);
+
+        hearts.players[0].setScore(90);
+        hearts.players[1].setScore(101);
+        hearts.players[2].setScore(25);
+        hearts.players[3].setScore(75);
+
+        // play a valid turn to trigger the end game logic
+        hearts.playTurn(hearts.players[0].getPlayerID(), CardID.CLUB_TWO.getOrdinal());
+
+        assertTrue(hearts.isGameEnded());
+        assertTrue(hearts.isGameOver());
+    };
+
+    @Test
+    public void determineGameWinnerTest() {
+        setup();
+        startGame(hearts, true, true);
+
+        hearts.players[0].setScore(90);
+        hearts.players[1].setScore(101);
+        hearts.players[2].setScore(25);
+        hearts.players[3].setScore(75);
+
+        // play a valid turn to trigger the end game logic
+        hearts.playTurn(hearts.players[0].getPlayerID(), CardID.CLUB_TWO.getOrdinal());
+
+
+        hearts.setGameWinner();
+        assertTrue(hearts.getGameWinner().ID == hearts.players[2].getPlayerID());
+    };
+
     @Test
     public void simulateFirstTrickTest() {
         setup();

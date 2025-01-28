@@ -2,14 +2,16 @@ package com.dungeondecks.marcushurlbut;
 import java.util.*;
 
 public class Player {
-    UUID ID;
+    public UUID ID;
     String username;
     public HashMap<Integer, Card> hand = new HashMap<Integer, Card>();
     public HashMap<Integer, Card> tricks = new HashMap<Integer, Card>();
     public HashMap<Integer, Card> passedCards = new HashMap<Integer, Card>();
-    boolean didPassCards = false;
-    boolean didReceiveCards = false;
+    public boolean didPassCards = false;
+    public boolean didReceiveCards = false;
     private int score = 0;
+    public UUID teammate;
+    public Integer bid = null;
 
     public Player(UUID ID) {
         this.ID = ID;

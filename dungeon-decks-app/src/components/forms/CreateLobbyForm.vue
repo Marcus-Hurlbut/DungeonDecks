@@ -26,12 +26,18 @@
         isLobbyCreated: Boolean,
       },
       methods: {
-        ...mapActions(['storeUsername']),
+        ...mapActions(['storeUsername', 'storePlayerIndex']),
         handleSubmit() {
           this.storeUsername(this.displayName);
+          this.storePlayerIndex(0);
           this.$emit('submit', this.displayName); 
 
-          this.$router.push('/heartsLobby');
+          this.$router.push({
+            path: '/lobby',
+            query: {
+              ...this.$route.query
+            }
+          });
         }
       }
     };

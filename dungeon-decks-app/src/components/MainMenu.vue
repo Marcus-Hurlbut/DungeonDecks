@@ -5,7 +5,7 @@
           <GameVaultButton />
   
           <ul class="hearts-dropdown-menu">
-            <HeartsDropdownMenu />
+            <GamesDropdownMenu />
           </ul>
         </li>
       </ul>
@@ -14,14 +14,14 @@
 </template>
   
 <script>
-import HeartsDropdownMenu from './dashboard/HeartsDropdownMenu.vue';
+import GamesDropdownMenu from './dashboard/GamesDropdownMenu.vue';
 import GameVaultButton from './dashboard/GameVaultButton.vue'
 import BubbleBackground from './animations/BubbleBackground.vue';
   
 export default {
     name: 'MainMenu',
     components: {
-      HeartsDropdownMenu,
+      GamesDropdownMenu,
       GameVaultButton,
       BubbleBackground
     },
@@ -39,11 +39,13 @@ export default {
   }
   
   .dungeon-decks {
-    background: linear-gradient(to bottom right, #b40e40, #9C27B0);
+    background: linear-gradient(to bottom right, #141414, #111111);
     animation: gradientAnimation 10s ease-in-out infinite;
     color: white;
     text-align: center;
-    text-shadow: 0px 0px 10px #00ffff, 0px 0px 20px #00ffff;
+    text-shadow: 0px 0px 10px #e97dff, 0px 0px 20px #e97dff;
+    border-radius: 25px;
+    opacity: .9;
   }
   
   ul {
@@ -68,6 +70,7 @@ export default {
   
   .game-vault-dropdown:hover .hearts-dropdown-menu {
     display: block;
+    border-radius: 30px;
   }
   
   .hearts-dropdown-menu {
@@ -75,9 +78,9 @@ export default {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    background: #9C27B0;
-    padding: 15px;
-    border-radius: 10px;
+    /* background: #9C27B0; */
+    /* padding: 15px; */
+    border-radius: 30px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
   
@@ -87,10 +90,6 @@ export default {
     cursor: pointer;
   }
   
-  .hearts-dropdown-menu li:hover {
-    background-color: #b40e40;
-  }
-
 
 </style>
   

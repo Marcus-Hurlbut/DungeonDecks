@@ -1,4 +1,4 @@
-package com.dungeondecks.marcushurlbut;
+package com.dungeondecks.marcushurlbut.games;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,42 +8,51 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.dungeondecks.marcushurlbut.Card;
+import com.dungeondecks.marcushurlbut.Deck;
+import com.dungeondecks.marcushurlbut.Game;
+import com.dungeondecks.marcushurlbut.PassingPhase;
+import com.dungeondecks.marcushurlbut.Player;
+import com.dungeondecks.marcushurlbut.Suit;
+import com.dungeondecks.marcushurlbut.card.Name;
 import com.dungeondecks.marcushurlbut.utils.CardID;
 
-public class Hearts {
+public class Hearts extends Game {
     public Deck deck = new Deck();
     int roundNumber = 0;
-    public Player[] players = new Player[4];
-    public HashMap<UUID, Integer> playerIDtoInt = new HashMap<UUID, Integer>();
+    // public Player[] players = new Player[4];
+    // public HashMap<UUID, Integer> playerIDtoInt = new HashMap<UUID, Integer>();
 
-    public UUID gameID;
-
-    public int playerInTurn = -1;
+    // public UUID gameID;
     public PassingPhase roundPassingType;
 
     int cardsPlayedThisTrick = 0;
     public Card startingTrickCard  = new Card(Suit.CLUB, Name.TWO, 2, "2_of_clubs.png");
     public List<Card> voidCardPile = new ArrayList<Card>(4);
 
-    public boolean active = false;
+    // public boolean active = false;
     public boolean passingPhaseComplete = false;
-    public boolean endOfRound = true;
     public boolean endOfTrick = false;
     public boolean firstTrick = true;
 
-    private boolean gameEnded = false;
-    public Player gameWinner = null;
+    // private boolean gameEnded = false;
+    // public Player gameWinner = null;
 
     Hearts() {}
     public Hearts(UUID gameID) {
         this.gameID = gameID;
     }
 
-    public void initializePlayers(List<Player> playerList) {
-        for (int i = 0; i < 4; i++) {
-            players[i] = playerList.get(i);
-            playerIDtoInt.put(playerList.get(i).ID, i);
+    public void initialize(Player[] players) {
+        initializePlayers(players);
+        shuffleAndDeal();
+        active = true;
+    }
 
+    public void initializePlayers(Player[] playerList) {
+        for (int i = 0; i < 4; i++) {
+            players[i] = playerList[i];
+            playerIDtoInt.put(playerList[i].ID, i);
             voidCardPile.add(null);
         }
     }
@@ -64,14 +73,6 @@ public class Hearts {
             });
             player.passedCards.clear();
         }        
-    }
-
-    public int getPlayerInitiative() {
-        if (playerInTurn >= 0) {
-            return playerInTurn;
-        }
-        System.err.println("Problem getting player initiative - not initialized");
-        return -1;
     }
 
     public void setFirstPlayerInitiative() {
@@ -125,13 +126,6 @@ public class Hearts {
     public boolean validateCardToPlay(int playerID, Card card) {
         if (isSuitValid(card.suit) || isPlayerVoidSuit(playerID)) {
             return true;
-        }
-
-        HashMap<Integer, Card> hand = players[playerID].getHand();
-        for (Map.Entry<Integer, Card> entry : hand.entrySet()) {
-            Card c = entry.getValue();
-            Suit suit = c.suit;
-            int value = c.value;
         }
         return false;
     }
@@ -243,6 +237,10 @@ public class Hearts {
         int intTargetID = 0;
         int intPlayerID = playerIDtoInt.get(playerID);
 
+        if (players[playerIDtoInt.get(playerID)].didPassCards) {
+            return playerID;
+        }
+
         // [0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0]
         if (roundPassingType == PassingPhase.LEFT) {
             if (intPlayerID < 3) {
@@ -315,14 +313,21 @@ public class Hearts {
     }
 
     public void setGameWinner() {
+        int winner = 0;
         if (gameEnded) {
-            int playerWithLowestScore = 0;
+            int playerindex = 0;
+            int lowest = Integer.MAX_VALUE;
             for (Player player : players) {
                 int playerScore = player.getScore();
-                playerWithLowestScore = Math.min(playerWithLowestScore, playerScore);
-            }
 
-            gameWinner = players[playerWithLowestScore];
+                if(playerScore < lowest) {
+                    winner = playerindex;
+                    lowest = playerScore;
+                }
+
+                playerindex++;
+            }
+            gameWinner = players[winner];
         }
     }
 
@@ -360,7 +365,7 @@ public class Hearts {
         }
 
         // First turn of new trick
-        else if(endOfTrick && playerIDindex == playerInTurn) {
+        else if (endOfTrick && playerIDindex == playerInTurn) {
             endOfTrick = false;
             startingTrickCard = card;
         }
@@ -404,34 +409,5 @@ public class Hearts {
             return true;
         }
         return false;
-    }
-
-    public int getCardID(Card card) {
-        int offset = 0;
-        switch (card.suit) {
-            case HEART:
-                offset = 0;
-                break;
-
-            case DIAMOND:
-                offset = 13;
-                break;
-            
-            case SPADE:
-                offset = 26;
-                break;
-
-            case CLUB:
-                offset = 39;
-                break;
-        
-            default:
-                break;
-        }
-
-        if (card.name.ordinal() == 0) {
-            return offset;
-        }
-        return (card.name.ordinal() + offset);
     }
 }

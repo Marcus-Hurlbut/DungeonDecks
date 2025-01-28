@@ -17,15 +17,24 @@
             <ul class="sublist">
               <li class="has-sublist">Hearts
                 <ul class="second-sublist">
-                  <router-link to="/createHeartsLobby">
+                  <router-link :to="{ path: '/createLobby', query: { game: 'hearts'} }">
                     <li>Create Lobby</li>
                   </router-link>
-                  <router-link to="/joinHearts">
+                  <router-link :to="{ path: '/joinLobby', query: { game: 'hearts'} }">
                     <li>Join Lobby</li>
                   </router-link>
                 </ul>
               </li>
-              <li>Cheat (Coming next..)</li>
+              <li class="has-sublist">Spades
+                <ul class="second-sublist">
+                  <router-link :to="{ path: '/createLobby', query: { game: 'spades'} }">
+                    <li>Create Lobby</li>
+                  </router-link>
+                  <router-link :to="{ path: '/joinLobby', query: { game: 'spades'} }">
+                    <li>Join Lobby</li>
+                  </router-link>
+                </ul>
+              </li>
             </ul>
           </li>
           <li>About</li>

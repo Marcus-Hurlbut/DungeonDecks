@@ -2,6 +2,8 @@ package com.dungeondecks.marcushurlbut;
 
 import java.util.*;
 
+import com.dungeondecks.marcushurlbut.card.Name;
+
 public class Deck {
 
     private Stack<Card> deck = new Stack<Card>();

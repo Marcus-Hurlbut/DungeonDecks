@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 import com.dungeondecks.marcushurlbut.Card;
-import com.dungeondecks.marcushurlbut.Name;
 import com.dungeondecks.marcushurlbut.Player;
 import com.dungeondecks.marcushurlbut.Suit;
+import com.dungeondecks.marcushurlbut.card.Name;
 import com.dungeondecks.marcushurlbut.utils.CardID;
 
 public class TestUtils {
@@ -22,12 +22,12 @@ public class TestUtils {
     public Player player_3 = new Player(player_3_id, "Mystique");
     public Player player_4 = new Player(player_4_id, "Magneto");
 
-    public ArrayList<Player> getPlayerList() {
-        ArrayList<Player> players = new ArrayList<Player>();
-        players.add(player_1);
-        players.add(player_2);
-        players.add(player_3);
-        players.add(player_4);
+    public Player[] getPlayerArray() {
+        Player[] players = new Player[4];
+        players[0] = player_1;
+        players[1] = player_2;
+        players[2] = player_3;
+        players[3] = player_4;
         return players;
     }
 

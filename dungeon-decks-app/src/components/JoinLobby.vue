@@ -20,7 +20,7 @@
   import { v4 as uuidv4 } from 'uuid';
 
   export default {
-    name: 'JoinHeartsComponent',
+    name: 'JoinLobby',
     components: {
       BubbleBackground,
     },
@@ -70,7 +70,7 @@
         });
       },
       subscribeJoinLobby() {
-        let subscription = '/topic/joinLobby/' + this.$store.getters.playerID
+        let subscription = '/topic/' + this.$route.query.game + '/joinLobby/' + this.$store.getters.playerID
         this.stompClient.subscribe(subscription, message => {
           let otherNames = JSON.parse(message.body);
           console.log('Joined lobby successfully - Other player names: ', otherNames)
@@ -84,13 +84,19 @@
 
           this.storePlayerIndex(index);
           this.storeIsLobbyCreated(true);
-          this.$router.push('/heartsLobby');
+          this.$router.push({
+            path: '/lobby',
+            query: {
+              ...this.$route.query
+            }
+          });
         });
       },
       publishJoinLobby() {
         if (this.connected) {
+          let dest = "/app/" + this.$route.query.game + "/joinLobby"
           this.stompClient.publish({
-            destination: "/app/joinLobby",
+            destination: dest,
             body: JSON.stringify({'playerID': this.$store.getters.playerID, 'roomID': this.lobbyID, 'cardIDs':"", 'name': this.$store.getters.username})
           })
         }
